@@ -31,7 +31,7 @@ int main() {
     Value.it_value.tv_usec = IntervalTime;
     setitimer(ITIMER_REAL, &Value, 0);
 
-    do {
+    while(1) {
         //TickCount();
         if (++NekoTickCount >= MAX_TICK) {
             NekoTickCount = 0;
@@ -49,7 +49,6 @@ int main() {
         pause();
         if (RaiseWindowDelay>0) RaiseWindowDelay--;
         //Interval();
-  } while (1);
-	
+    }	
     return 0;
 }

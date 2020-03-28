@@ -29,7 +29,8 @@
 #define MAID_MOVE1              10
 #define MAID_MOVE2              11
 #define MAID_MOVE3              12
-#define NEKO_AWAKE              13
+#define NEKO_KAKI1              13
+#define NEKO_KAKI2              14
 #define MAXDISPLAYNAME          (64 + 5)
 #define NOTDEFINED              (-1)
 
@@ -66,7 +67,7 @@ typedef struct _AnimalDefaults {
 
 AnimalDefaultsData AnimalDefaultsDataTable[] =
 {
-  { "miku", 13, 6, 32, 32, 125000L, 0, 0 }
+  { "miku", 13, 6, 32, 32, 225000L, 0, 0 }
 };
 
 char    *Foreground = NULL;             /*   foreground */
@@ -113,8 +114,8 @@ Pixmap  Danger1Msk, Danger2Msk, Danger3Msk, MaidAlert1Msk, MaidPc1Msk, MaidPc2Ms
 GC      Danger1GC, Danger2GC, Danger3GC, MaidAlert1GC, MaidPc1GC, MaidPc2GC, MaidPc3GC, MaidWelcome1GC, MaidWelcome2GC, MaidWelcomeGC, MaidMove1GC, MaidMove2GC, MaidMove3GC;
 
 
-Pixmap Neko1Xbm, Neko1Msk;
-GC     Neko1GC;
+Pixmap Neko1Xbm, Neko2Xbm, Neko1Msk, Neko2Msk;
+GC     Neko1GC, Neko2GC;
 
 typedef struct {
     GC          *GCCreatePtr;
@@ -125,8 +126,11 @@ typedef struct {
 } BitmapGCData;
 BitmapGCData    BitmapGCDataTable[] =
 {
-    { &Neko1GC, &Neko1Xbm,  awake_bits,
-      &Neko1Msk, awake_mask_bits },
+    { &Neko1GC, &Neko1Xbm,  kaki1_bits,
+      &Neko1Msk, kaki1_bits },
+
+    { &Neko2GC, &Neko2Xbm,  kaki2_bits,
+      &Neko2Msk, kaki2_bits },
 
     { &MaidAlert1GC, &MaidAlert1Xbm,  maid_alert1_bits,
       &MaidAlert1Msk, maid_alert1_mask_bits },
@@ -167,33 +171,35 @@ BitmapGCData    BitmapGCDataTable[] =
 
     { NULL, NULL, NULL, NULL, NULL }
 };
-typedef struct {
-    GC          *TickGCPtr;
-    Pixmap      *TickMaskPtr;
-} Animation;
 
-Animation       AnimationPattern[][2] =
-{
-   { &Danger1GC, &Danger1Msk } ,
-   { &Danger2GC, &Danger2Msk } ,
-   { &Danger3GC, &Danger3Msk } ,
+void setNekoState(int state) {
+  NekoState = state;
 
-   { &MaidAlert1GC, &MaidAlert1Msk } ,
-
-   { &MaidPc1GC, &MaidPc1Msk } ,
-   { &MaidPc2GC, &MaidPc2Msk } ,
-   { &MaidPc3GC, &MaidPc3Msk } ,
-
-   { &MaidWelcome1GC, &MaidWelcome1Msk } ,
-   { &MaidWelcome2GC, &MaidWelcome2Msk } ,
-   { &MaidWelcomeGC, &MaidWelcomeMsk } ,
-
-   { &MaidMove1GC, &MaidMove1Msk } ,
-   { &MaidMove2GC, &MaidMove2Msk } ,
-   { &MaidMove3GC, &MaidMove3Msk } ,
-
-   { &Neko1GC, &Neko1Msk } ,
-};
+  if (NekoState == MAID_WELCOME1 || NekoState == MAID_WELCOME2 || NekoState == MAID_WELCOME) {
+    BITMAP_WIDTH = 199;
+    BITMAP_HEIGHT = 253;
+  }
+  else if (NekoState == MIKU_DANGER1 || NekoState == MIKU_DANGER2 || NekoState == MIKU_DANGER3) {
+    BITMAP_WIDTH = 296;
+    BITMAP_HEIGHT = 280;
+  }
+  else if (NekoState == MAID_ALERT1) {
+    BITMAP_WIDTH = 300;
+    BITMAP_HEIGHT = 168;
+  }
+  else if (NekoState == MAID_PC1 || NekoState == MAID_PC2 || NekoState == MAID_PC3) {
+    BITMAP_WIDTH = 332;
+    BITMAP_HEIGHT = 280;
+  }
+  else if (NekoState == MAID_MOVE1 || NekoState == MAID_MOVE2 || NekoState == MAID_MOVE3) {
+    BITMAP_WIDTH = 260;
+    BITMAP_HEIGHT = 191;
+  }
+  else if (NekoState == NEKO_KAKI1 || NekoState == NEKO_KAKI2) {
+    BITMAP_WIDTH = 32;
+    BITMAP_HEIGHT = 32;
+  }
+}
 
 void InitScreen(char *DisplayName)
 {
@@ -341,7 +347,33 @@ Bool ProcessEvent()
     return(ContinueState);
 }
 
+typedef struct {
+    GC          *TickGCPtr;
+    Pixmap      *TickMaskPtr;
+} Animation;
 
+Animation       AnimationPattern[][2] =
+{
+  { &Danger1GC, &Danger1Msk } ,
+  { &Danger2GC, &Danger2Msk } ,
+  { &Danger3GC, &Danger3Msk } ,
+
+  { &MaidAlert1GC, &MaidAlert1Msk } ,
+
+  { &MaidPc1GC, &MaidPc1Msk } ,
+  { &MaidPc2GC, &MaidPc2Msk } ,
+  { &MaidPc3GC, &MaidPc3Msk } ,
+
+  { &MaidWelcome1GC, &MaidWelcome1Msk } ,
+  { &MaidWelcome2GC, &MaidWelcome2Msk } ,
+  { &MaidWelcomeGC, &MaidWelcomeMsk } ,
+
+  { &MaidMove1GC, &MaidMove1Msk } ,
+  { &MaidMove2GC, &MaidMove2Msk } ,
+  { &MaidMove3GC, &MaidMove3Msk } ,
+
+  { &Neko1GC, &Neko1Msk } ,
+};
 void DrawNeko(int x, int y, Animation DrawAnime)
 {
     register GC         DrawGC = *(DrawAnime.TickGCPtr);
@@ -374,6 +406,8 @@ void DrawNeko(int x, int y, Animation DrawAnime)
 
     NekoLastGC = DrawGC;
 }
+
+
 void ProcessNeko()
 {
   struct itimerval      Value;
@@ -393,21 +427,27 @@ void ProcessNeko()
   setitimer(ITIMER_REAL, &Value, 0);
 
   do {
-    DrawNeko(NekoX, NekoY, AnimationPattern[NekoState][NekoTickCount & 0x1]);
+    printf("count: %d  %d:%d %d:%d\n", NekoTickCount, BITMAP_HEIGHT, BITMAP_WIDTH, NekoY, NekoX);
 
-    //TickCount();
-    if (++NekoTickCount >= MAX_TICK) {
+    if (NekoState == MIKU_DANGER1) {
+        setNekoState(MIKU_DANGER2);
+    }
+    else if (NekoState == MIKU_DANGER2) {
+        setNekoState(MIKU_DANGER3);
+    }
+    else {
+        setNekoState(MIKU_DANGER1);
+    }
+    
+
+    if (NekoTickCount == MAX_TICK) 
         NekoTickCount = 0;
+    else {
+        NekoTickCount++;
     }
 
-    if (NekoTickCount % 2 == 0) {
-        if (NekoStateCount < MAX_TICK) {
-            NekoStateCount++;
-        }
-    }
-    //TickCount();
+    DrawNeko(NekoX, NekoY-300, AnimationPattern[NekoState][0]);
 
-    printf("ssssssss\n");
 
     //Interval();
     pause();
@@ -442,34 +482,7 @@ int main()
 {
   ProgramName = "anime";
 
-  NekoState = MIKU_DANGER1;
-
-  if (NekoState == MAID_WELCOME1 || NekoState == MAID_WELCOME2 || NekoState == MAID_WELCOME) {
-    BITMAP_WIDTH = 199;
-    BITMAP_HEIGHT = 253;
-  }
-  else if (NekoState == MIKU_DANGER1 || NekoState == MIKU_DANGER2 || NekoState == MIKU_DANGER3) {
-    BITMAP_WIDTH = 296;
-    BITMAP_HEIGHT = 280;
-  }
-  else if (NekoState == MAID_ALERT1) {
-    BITMAP_WIDTH = 300;
-    BITMAP_HEIGHT = 168;
-  }
-  else if (NekoState == MAID_PC1 || NekoState == MAID_PC2 || NekoState == MAID_PC3) {
-    BITMAP_WIDTH = 332;
-    BITMAP_HEIGHT = 280;
-  }
-  else if (NekoState == MAID_MOVE1 || NekoState == MAID_MOVE2 || NekoState == MAID_MOVE3) {
-    BITMAP_WIDTH = 260;
-    BITMAP_HEIGHT = 191;
-  }
-  else if (NekoState == NEKO_AWAKE) {
-    BITMAP_WIDTH = 32;
-    BITMAP_HEIGHT = 32;
-  }
-
-  printf("%d\n", NekoState);
+  setNekoState(MIKU_DANGER1);
 
   XSetErrorHandler(NekoErrorHandler);
 
