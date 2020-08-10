@@ -1,0 +1,18 @@
+MAIN := main.o # atau MAIN = main.o
+HELLO := hello.o
+OBJS := $(MAIN) $(HELLO)
+
+all:	hello
+hello:	$(OBJS)
+	gcc -o hello $(OBJS)
+
+%.o: %.c hello.h
+	gcc -c $<
+clean:
+	rm -rf $(OBJS)
+	rm -rf hello
+
+# Tingkat ini sudah memakai Variable
+# Variable dapat didefinisikan dengan Syntx:
+#	VARNAME = Values
+# dimana Values berupa string, variable lain (dengan format $(OTHERWISE) )

@@ -1,0 +1,29 @@
+# Shell:
+# gcc -o hello hello.c main.c
+
+# catatan:
+# perhatikan bahwa kita tidak pernah memberikan header file (dalam ini hello.h) sebagai file sumber yang harus
+# dicompile oleh gcc. file hello.h akan di proses secara otomatis jika ada file .c yang mengincludenya
+
+all:	hello
+hello:	hello.o main.o
+	gcc -o hello hello.o main.o
+
+hello.o: hello.c hello.h
+	gcc -c hello.c
+
+main.o: main.c hello.h
+	gcc -c main.c
+
+clean:
+	rm -f *.o
+	rm -f hello
+
+# pada script diatas terlihat bahwa hello.o tergantung dari hello.c dan hello.h, sehingga
+# jika file-file ini berubah maka hello.o akan dicompile lagi.
+
+# sedangkan file main.o tergantung dari main.c dan hello.h sehingga bila file-file ini
+# berubah maka main.o akan di recompile lagi
+
+# Dan jika main.o atau hello.o ada yang berubah, maka file
+# hello akan direcompile lagi.

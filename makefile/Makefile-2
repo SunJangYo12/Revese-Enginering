@@ -1,0 +1,8 @@
+all:    hello
+hello:  main.o hello.o
+	gcc -o hello main.o hello.o
+
+%.o:	%.c hello.h
+	gcc -c $<
+
+# Penyederhanaan jika ada banyak file .c untuk dijadikan targer .o
